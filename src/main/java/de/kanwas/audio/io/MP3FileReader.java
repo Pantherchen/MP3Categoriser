@@ -5,11 +5,13 @@
 package de.kanwas.audio.io;
 
 import java.io.File;
-import java.io.FilenameFilter;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.kanwas.audio.commons.MP3Content;
 import de.kanwas.audio.commons.MP3File;
+import de.kanwas.audio.commons.MP3Folder;
 
 /**
  * @author $Author$
@@ -23,22 +25,25 @@ public class MP3FileReader {
 
   private String mp3Dir;
 
-  private List<MP3File> mp3Files;
+  private List<MP3Content> mp3Folder;
 
   public enum MUSICFILES {
     MP3, OGG, MP4, WAV;
 
     public static boolean isMusicFile(String filename) {
-      if (filename.contains("MP3")) {
+      if (filename == null) {
+        return false;
+      }
+      if (filename.toUpperCase().endsWith("MP3")) {
         return true;
       }
-      if (filename.contains("OGG")) {
+      if (filename.toUpperCase().endsWith("OGG")) {
         return true;
       }
-      if (filename.contains("MP4")) {
+      if (filename.toUpperCase().endsWith("MP4")) {
         return true;
       }
-      if (filename.contains("WAV")) {
+      if (filename.toUpperCase().endsWith("WAV")) {
         return true;
       }
       return false;
@@ -47,7 +52,7 @@ public class MP3FileReader {
 
   public MP3FileReader(String musicPath) {
     this.mp3Dir = musicPath;
-    this.mp3Files = new ArrayList<MP3File>();
+    this.mp3Folder = new ArrayList<MP3Content>();
 
   }
 
@@ -57,28 +62,37 @@ public class MP3FileReader {
     }
     File catFile = new File(this.mp3Dir);
     if (catFile.exists() && catFile.canRead()) {
-      File[] files = catFile.listFiles(new FilenameFilter(){
-
-        @Override
-        public boolean accept(File dir, String name) {
-          return MUSICFILES.isMusicFile(name);
-        }
-      });
-      MP3File mp3File = null;
-      for (File f : files) {
-        mp3File = new MP3File(f);
-        if (!this.mp3Files.contains(mp3File)) {
-          this.mp3Files.add(mp3File);
-        }
-      }
+      readAllFiles(catFile);
     }
   }
 
-  public List<MP3File> getMP3Files() {
-    return this.mp3Files;
+  /**
+   * 
+   */
+  private void readAllFiles(File file) {
+    File[] files = file.listFiles(new FileFilter(){
+
+      @Override
+      public boolean accept(File pathname) {
+        if (pathname.isDirectory()) {
+          readAllFiles(pathname);
+          return false;
+        }
+        return MUSICFILES.isMusicFile(pathname.getName());
+      }
+    });
+    MP3File mp3 = null;
+    MP3Folder folder = new MP3Folder(file);
+    for (File f : files) {
+      mp3 = new MP3File(f, folder);
+      folder.addMP3File(mp3);
+    }
+    if (folder != null && !mp3Folder.contains(folder)) {
+      this.mp3Folder.add(folder);
+    }
   }
 
-  public MP3File[] getMP3FilesArray() {
-    return this.mp3Files.toArray(new MP3File[this.mp3Files.size()]);
+  public List<MP3Content> getMP3Files() {
+    return this.mp3Folder;
   }
 }

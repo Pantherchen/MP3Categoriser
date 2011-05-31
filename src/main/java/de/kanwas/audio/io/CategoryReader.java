@@ -18,17 +18,17 @@ import de.kanwas.audio.commons.Category;
  * @author $Author$
  * @version $Revision$ ($Date$)
  */
-public class CategoryReader2 {
+public class CategoryReader {
   /** version number */
   public static final String VER = "$Revision$";
 
-  private static final String DEFAULT_CATEGORY_FILENAME = "C:/category";
+  private static final String DEFAULT_CATEGORY_FILENAME = "C:/category.txt";
 
   private String filename;
 
   private List<Category> categories;
 
-  public CategoryReader2(String filename) {
+  public CategoryReader(String filename) {
     this.filename = filename;
     this.categories = new ArrayList<Category>();
 
@@ -48,15 +48,27 @@ public class CategoryReader2 {
    * @param catFile
    */
   private void read(File catFile) {
-    List<String> cats = new ArrayList<String>();
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new FileReader(catFile));
-      String category = null;
-      while (reader.read() > 0) {
-        category = reader.readLine();
-        if (category != null && !cats.contains(category)) {
-          cats.add(category);
+      String categoryLine = null;
+      String catName = null;
+      String[] catLine = null;
+      int index = 0;
+      while ((categoryLine = reader.readLine()) != null) {
+        catLine = categoryLine.split(",");
+        if (catLine != null && catLine[0] != null && catLine[1] != null) {
+          catName = catLine[0];
+          try {
+            index = Integer.parseInt(catLine[1]);
+          } catch (NumberFormatException nfe) {
+            nfe.printStackTrace();
+            index = -1;
+          }
+          Category category = new Category(catName, index);
+          if (category != null && !categories.contains(category)) {
+            this.categories.add(category);
+          }
         }
       }
     } catch (FileNotFoundException fnfe) {
@@ -64,13 +76,12 @@ public class CategoryReader2 {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    if (cats != null) {
-      Category cat = null;
-      for (String c : cats) {
-        cat = new Category(c);
-        if (!this.categories.contains(cat)) {
-          this.categories.add(cat);
-        }
+    finally{
+      try {
+        reader.close();
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
       }
     }
   }
