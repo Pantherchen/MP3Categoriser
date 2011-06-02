@@ -25,7 +25,7 @@ public class MP3FileReader {
 
   private String mp3Dir;
 
-  private List<MP3Content> mp3Folder;
+  private List<MP3Content> mp3Content;
 
   public enum MUSICFILES {
     MP3, OGG, MP4, WAV;
@@ -52,7 +52,7 @@ public class MP3FileReader {
 
   public MP3FileReader(String musicPath) {
     this.mp3Dir = musicPath;
-    this.mp3Folder = new ArrayList<MP3Content>();
+    this.mp3Content = new ArrayList<MP3Content>();
 
   }
 
@@ -87,12 +87,12 @@ public class MP3FileReader {
       mp3 = new MP3File(f, folder);
       folder.addMP3File(mp3);
     }
-    if (folder != null && !mp3Folder.contains(folder)) {
-      this.mp3Folder.add(folder);
+    if (folder != null && !mp3Content.contains(folder)) {
+      this.mp3Content.add(folder);
     }
   }
 
   public List<MP3Content> getMP3Files() {
-    return this.mp3Folder;
+    return this.mp3Content;
   }
 }

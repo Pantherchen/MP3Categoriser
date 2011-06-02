@@ -120,4 +120,15 @@ public class MP3File extends MP3Content {
     return true;
   }
 
+  /**
+   * @param dbFile
+   * @return
+   */
+  public boolean isEqualTo(MP3File dbFile) {
+    if (this.getFile().getAbsolutePath().equals(dbFile.getFile().getAbsolutePath())
+        && this.getParent().getFolder().getAbsolutePath().equals(dbFile.getParent().getFolder().getAbsolutePath())) {
+      return true;
+    }
+    return false;
+  }
 }

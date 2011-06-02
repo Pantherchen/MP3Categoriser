@@ -49,4 +49,25 @@ public class MP3Folder extends MP3Content {
 
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((this.folder == null) ? 0 : this.folder.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null) return false;
+    if (getClass() != obj.getClass()) return false;
+    MP3Folder other = (MP3Folder)obj;
+    if (this.folder == null) {
+      if (other.folder != null) return false;
+    } else if (!this.folder.equals(other.folder)) return false;
+    return true;
+  }
+
+  
 }
