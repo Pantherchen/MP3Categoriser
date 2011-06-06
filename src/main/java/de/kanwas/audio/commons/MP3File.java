@@ -37,7 +37,7 @@ public class MP3File extends MP3Content {
   public MP3File(String data, List<Category> categories) {
     this.file = new File(data);
     if (this.file != null && this.file.canRead()) {
-      this.parent = new MP3Folder(new File(this.file.getPath()));
+      this.parent = new MP3Folder(new File(this.file.getParent()));
     }
     this.categories = new HashMap<String, Category>();
     for (Category category : categories) {
@@ -77,6 +77,15 @@ public class MP3File extends MP3Content {
       }
     }
     return null;
+  }
+
+  public void setFilefromDB(MP3File file) {
+    for (Category c : file.getCategories()) {
+      this.categories.put(c.getName(), c);
+    }
+    this.file = file.getFile();
+    this.parent = file.getParent();
+
   }
 
   public File getFile() {

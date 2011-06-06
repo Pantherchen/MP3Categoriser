@@ -6,8 +6,11 @@ package de.kanwas.audio.io;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.io.FileUtils;
 
 import de.kanwas.audio.commons.MP3Content;
 import de.kanwas.audio.commons.MP3File;
@@ -17,9 +20,12 @@ import de.kanwas.audio.commons.MP3Folder;
  * @author $Author$
  * @version $Revision$ ($Date$)
  */
-public class MP3FileReader {
+public class MP3FileHandler {
   /** version number */
   public static final String VER = "$Revision$";
+
+  private static final org.apache.commons.logging.Log logger = org.apache.commons.logging.LogFactory
+    .getLog(MP3FileHandler.class);
 
   private static final String DEFAULT_CATEGORY_FILENAME = "C:/mp3";
 
@@ -50,7 +56,7 @@ public class MP3FileReader {
     }
   }
 
-  public MP3FileReader(String musicPath) {
+  public MP3FileHandler(String musicPath) {
     this.mp3Dir = musicPath;
     this.mp3Content = new ArrayList<MP3Content>();
 
@@ -94,5 +100,18 @@ public class MP3FileReader {
 
   public List<MP3Content> getMP3Files() {
     return this.mp3Content;
+  }
+
+  public void createPlaylist(List<MP3File> files2Export, File outputFolder) {
+    File outputFile = null;
+    for (MP3File mp3file : files2Export) {
+      outputFile = new File(outputFolder + "/" + mp3file.getFile().getName());
+      try {
+        FileUtils.copyFile(mp3file.getFile(), outputFile);
+      } catch (IOException e) {
+        logger.error("Could not write file " + mp3file + " to playlistfolder: " + outputFile);
+        e.printStackTrace();
+      }
+    }
   }
 }
