@@ -68,6 +68,12 @@ public class MP3FileHandler {
     }
     File catFile = new File(this.mp3Dir);
     if (catFile.exists() && catFile.canRead()) {
+      MP3Folder rootParentFolder = null;
+      if (catFile.getParentFile() != null) {
+        rootParentFolder = new MP3Folder(catFile.getParentFile(), null);
+      }
+      MP3Folder rootFolder = new MP3Folder(catFile, rootParentFolder);
+      this.mp3Content.add(rootFolder);
       readAllFiles(catFile);
     }
   }
@@ -88,10 +94,29 @@ public class MP3FileHandler {
       }
     });
     MP3File mp3 = null;
-    MP3Folder folder = new MP3Folder(file);
+    MP3Folder mp3ParentFolder = null;
+    if (file != null && file.getParentFile() != null) {
+      for (MP3Content c : this.mp3Content) {
+        if (c instanceof MP3Folder) {
+          MP3Folder curFolder = (MP3Folder)c;
+          if (curFolder.getFolder().equals(file.getParentFile())) {
+            mp3ParentFolder = curFolder;
+            break;
+          }
+        }
+      }
+      if (mp3ParentFolder == null) {
+        mp3ParentFolder = new MP3Folder(file.getParentFile(), null);
+        if (!this.mp3Content.contains(mp3ParentFolder)) {
+          this.mp3Content.add(mp3ParentFolder);
+        }
+      }
+    }
+    MP3Folder folder = new MP3Folder(file, mp3ParentFolder);
+    mp3ParentFolder.addMP3Content(folder);
     for (File f : files) {
       mp3 = new MP3File(f, folder);
-      folder.addMP3File(mp3);
+      folder.addMP3Content(mp3);
     }
     if (folder != null && !mp3Content.contains(folder)) {
       this.mp3Content.add(folder);

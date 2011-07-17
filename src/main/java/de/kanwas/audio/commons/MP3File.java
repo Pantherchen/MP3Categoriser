@@ -5,10 +5,20 @@
 package de.kanwas.audio.commons;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
 
 /**
  * @author $Author$
@@ -25,10 +35,39 @@ public class MP3File extends MP3Content {
 
   private MP3Folder parent;
 
+  private Tag mp3Tag;
+
   public MP3File(File file, MP3Folder parent) {
     this.file = file;
     this.parent = parent;
     this.categories = new HashMap<String, Category>();
+    createTag();
+  }
+
+  /**
+   * @return
+   */
+  private void createTag() {
+    AudioFile f;
+    try {
+      f = AudioFileIO.read(file);
+      this.mp3Tag = f.getTag();
+    } catch (CannotReadException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (TagException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ReadOnlyFileException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (InvalidAudioFrameException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   /**
@@ -37,7 +76,7 @@ public class MP3File extends MP3Content {
   public MP3File(String data, List<Category> categories) {
     this.file = new File(data);
     if (this.file != null && this.file.canRead()) {
-      this.parent = new MP3Folder(new File(this.file.getParent()));
+      this.parent = new MP3Folder(new File(this.file.getParent()), null);
     }
     this.categories = new HashMap<String, Category>();
     for (Category category : categories) {
@@ -98,9 +137,44 @@ public class MP3File extends MP3Content {
 
   @Override
   public String toString() {
-    return this.file.getName();
+    return this.mp3Tag.getFirstField(FieldKey.TITLE).toString();
   }
 
+  /**
+   * @return the dirty
+   */
+  public boolean isDirty() {
+    for (Category c : getCategories()) {
+      if (c.isDirty()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @return the mp3Tag
+   */
+  public Tag getMp3Tag() {
+    return this.mp3Tag;
+  }
+
+  /**
+   * @param dbFile
+   * @return
+   */
+  public boolean isEqualTo(MP3File dbFile) {
+    if (this.getFile().getAbsolutePath().equals(dbFile.getFile().getAbsolutePath())
+        && this.getParent().getFolder().getAbsolutePath().equals(dbFile.getParent().getFolder().getAbsolutePath())) {
+      return true;
+    }
+    return false;
+  }
+
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -111,6 +185,10 @@ public class MP3File extends MP3Content {
     return result;
   }
 
+  /*
+   * (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj) return true;
@@ -129,15 +207,4 @@ public class MP3File extends MP3Content {
     return true;
   }
 
-  /**
-   * @param dbFile
-   * @return
-   */
-  public boolean isEqualTo(MP3File dbFile) {
-    if (this.getFile().getAbsolutePath().equals(dbFile.getFile().getAbsolutePath())
-        && this.getParent().getFolder().getAbsolutePath().equals(dbFile.getParent().getFolder().getAbsolutePath())) {
-      return true;
-    }
-    return false;
-  }
 }
