@@ -171,8 +171,7 @@ public class MP3File extends MP3Content {
     return false;
   }
 
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -181,12 +180,12 @@ public class MP3File extends MP3Content {
     int result = 1;
     result = prime * result + ((this.categories == null) ? 0 : this.categories.hashCode());
     result = prime * result + ((this.file == null) ? 0 : this.file.hashCode());
+    result = prime * result + ((this.mp3Tag == null) ? 0 : this.mp3Tag.hashCode());
     result = prime * result + ((this.parent == null) ? 0 : this.parent.hashCode());
     return result;
   }
 
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -201,10 +200,14 @@ public class MP3File extends MP3Content {
     if (this.file == null) {
       if (other.file != null) return false;
     } else if (!this.file.equals(other.file)) return false;
+    if (this.mp3Tag == null) {
+      if (other.mp3Tag != null) return false;
+    } else if (!this.mp3Tag.equals(other.mp3Tag)) return false;
     if (this.parent == null) {
       if (other.parent != null) return false;
     } else if (!this.parent.equals(other.parent)) return false;
     return true;
   }
 
+  
 }

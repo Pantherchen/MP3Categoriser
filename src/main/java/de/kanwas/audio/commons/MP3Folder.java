@@ -19,8 +19,6 @@ public class MP3Folder extends MP3Content {
 
   private File folder;
 
-  private List<MP3File> mp3Files;
-
   private List<MP3Content> mp3Content;
 
   private final MP3Folder parentFolder;
@@ -28,7 +26,6 @@ public class MP3Folder extends MP3Content {
   public MP3Folder(File folder, MP3Folder parentFolder) {
     this.folder = folder;
     this.parentFolder = parentFolder;
-    this.mp3Files = new ArrayList<MP3File>();
     this.mp3Content = new ArrayList<MP3Content>();
   }
 
@@ -37,7 +34,13 @@ public class MP3Folder extends MP3Content {
   }
 
   public List<MP3File> getMp3Files() {
-    return this.mp3Files;
+    List<MP3File> mp3Files = new ArrayList<MP3File>();
+    for(MP3Content content : this.mp3Content) {
+      if(content instanceof MP3File) {
+        mp3Files.add((MP3File)content);
+      }
+    }
+    return mp3Files;
   }
 
   @Override
@@ -51,10 +54,6 @@ public class MP3Folder extends MP3Content {
   public void addMP3Content(MP3Content mp3) {
     if (!this.mp3Content.contains(mp3)) {
       this.mp3Content.add(mp3);
-      if (mp3 instanceof MP3File && !this.mp3Files.contains(mp3)) {
-        MP3File file = (MP3File)mp3;
-        this.mp3Files.add(file);
-      }
     }
   }
 
@@ -72,8 +71,7 @@ public class MP3Folder extends MP3Content {
     return this.parentFolder;
   }
 
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -81,13 +79,12 @@ public class MP3Folder extends MP3Content {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((this.folder == null) ? 0 : this.folder.hashCode());
-    result = prime * result + ((this.mp3Files == null) ? 0 : this.mp3Files.hashCode());
+    result = prime * result + ((this.mp3Content == null) ? 0 : this.mp3Content.hashCode());
     result = prime * result + ((this.parentFolder == null) ? 0 : this.parentFolder.hashCode());
     return result;
   }
 
-  /*
-   * (non-Javadoc)
+  /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -99,13 +96,14 @@ public class MP3Folder extends MP3Content {
     if (this.folder == null) {
       if (other.folder != null) return false;
     } else if (!this.folder.equals(other.folder)) return false;
-    if (this.mp3Files == null) {
-      if (other.mp3Files != null) return false;
-    } else if (!this.mp3Files.equals(other.mp3Files)) return false;
+//    if (this.mp3Content == null) {
+//      if (other.mp3Content != null) return false;
+//    } else if (!this.mp3Content.equals(other.mp3Content)) return false;
     if (this.parentFolder == null) {
       if (other.parentFolder != null) return false;
     } else if (!this.parentFolder.equals(other.parentFolder)) return false;
     return true;
   }
+
 
 }
